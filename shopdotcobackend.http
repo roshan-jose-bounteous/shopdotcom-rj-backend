@@ -1,0 +1,6 @@
+@shopdotcobackend_HostAddress = http://localhost:5105
+
+GET {{shopdotcobackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
