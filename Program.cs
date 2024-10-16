@@ -1,44 +1,74 @@
-var builder = WebApplication.CreateBuilder(args);
+using System.Text;
+using shopdotcobackend.Services;
+using Microsoft.IdentityModel.Tokens;
+using Supabase;
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+var builder = WebApplication.CreateBuilder(args);
+ 
+
+
+builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddAuthorization();
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder => builder.WithOrigins("http://localhost:3000") // Replace with your frontend URL
+                          .AllowAnyHeader()
+                          .AllowAnyMethod());
+});
+ 
+var url = builder.Configuration["Supabase:Url"];
+var key = builder.Configuration["Supabase:ApiKey"];
+
+
+ 
+builder.Services.AddSingleton(sp =>
+{
+    var options = new SupabaseOptions { AutoRefreshToken = true };
+    var client = new Client(url, key, options);
+    client.InitializeAsync().Wait();
+    return client;
+});
+
+builder.Services.AddScoped<SupabaseService>();
+
+ 
+ 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+ 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseCors("AllowSpecificOrigin");
+ 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+ 
+// app.MapGet("/getProduct/{id}", async (int id, Client client) =>
+// {
+//     var response = await client.From<Product>().Get();
+//     var foundProduct = response.Models;
 
+//      Console.WriteLine($"Response: {Newtonsoft.Json.JsonConvert.SerializeObject(response)}");
+ 
+//     if (foundProduct is null)
+//     {
+//         return Results.NotFound($"Product with ID {id} not found., {response}, product {foundProduct}");
+//     }
+
+//     return Results.Ok(Newtonsoft.Json.JsonConvert.SerializeObject(foundProduct));
+// });
+
+
+ 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
-
+app.UseAuthorization();
+app.MapControllers();
+ 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+ 
