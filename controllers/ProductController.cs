@@ -26,9 +26,9 @@ namespace shopdotcobackend.controllers
         {
             var products = await _supabaseService.GetAllProducts();
 
-            return Ok(products);
-            // var serializedProducts = JsonConvert.SerializeObject(products);
-            // return Ok(serializedProducts);
+            // return Ok(products);
+            var serializedProducts = JsonConvert.SerializeObject(products);
+            return Ok(serializedProducts);
 
         }
 
