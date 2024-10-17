@@ -33,23 +33,57 @@ namespace shopdotcobackend.controllers
 
         // GET: api/product/tags
 
-        [HttpGet("filter")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByFilter(string? tags, string? sizes)
+        // [HttpGet("filter")]
+        // public async Task<ActionResult<IEnumerable<Product>>> GetProductsByFilter(string? tags, string? sizes)
+        // {
+
+        //     if (string.IsNullOrEmpty(tags) && string.IsNullOrEmpty(sizes))
+        //     {
+        //         return await GetAllProducts();
+        //     }
+
+        //     var products = await _supabaseService.GetProductsByFilter(tags, sizes);
+        //     if (products == null || !products.Any())
+        //     {
+        //         return NotFound("No products found for the specified filters.");
+        //     }
+
+        //     return Ok(products);
+        // }
+
+         [HttpGet("sort")]
+    public async Task<ActionResult<IEnumerable<Product>>> GetProductsBySort(string sort)
+    {
+        var products = await _supabaseService.GetProductsBySort(sort);
+
+        if (products == null || !products.Any())
         {
-
-            if (string.IsNullOrEmpty(tags) && string.IsNullOrEmpty(sizes))
-            {
-                return BadRequest("At least one filter (tags or sizes) is required.");
-            }
-
-            var products = await _supabaseService.GetProductsByFilter(tags, sizes);
-            if (products == null || !products.Any())
-            {
-                return NotFound("No products found for the specified filters.");
-            }
-
-            return Ok(products);
+            return NotFound("No products found.");
         }
+
+        return Ok(products);
+    }
+
+    
+
+        [HttpGet("filter")]
+public async Task<ActionResult<IEnumerable<Product>>> GetProductsByFilter(string? tags, string? sizes, string? sort)
+{
+    // Get all products if no filters or sort specified
+    if (string.IsNullOrEmpty(tags) && string.IsNullOrEmpty(sizes))
+    {
+        return await GetProductsBySort(sort); // Call the new GetProductsBySort method
+    }
+
+    var products = await _supabaseService.GetProductsByFilter(tags, sizes, sort);
+    if (products == null || !products.Any())
+    {
+        return NotFound("No products found for the specified filters.");
+    }
+
+    return Ok(products);
+}
+
 
 
         // GET: api/product/{id}

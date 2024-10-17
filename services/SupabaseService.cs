@@ -32,6 +32,36 @@ namespace shopdotcobackend.Services
             return response;
         }
 
+
+public async Task<List<Product>> GetProductsBySort(string sort)
+{
+    var response = await _supabaseClient.From<Product>().Get();
+    var products = response.Models;
+
+    // Sorting logic
+    if (products == null || !products.Any())
+    {
+        return new List<Product>(); // Return an empty list if no products found
+    }
+
+    switch (sort)
+    {
+        case "price-high-to-low":
+            return products.OrderByDescending(p => p.price).ToList();
+
+        case "price-low-to-high":
+            return products.OrderBy(p => p.price).ToList();
+
+        case "alphabetical":
+            return products.OrderBy(p => p.name).ToList();
+
+        case "most-popular":
+            return products;
+        default:
+            return products;
+    }
+}
+
         // Get Product by Tags
         //  public async Task<List<Product>> GetProductsByTags(string tags)
         // {
@@ -42,40 +72,102 @@ namespace shopdotcobackend.Services
         //     return response.Models;
         // }
 
-         public async Task<List<Product>> GetProductsByFilter(string? tags, string? sizes)
+        //  public async Task<List<Product>> GetProductsByFilter(string? tags, string? sizes)
          
-        {
+        // {
 
-            if(!string.IsNullOrEmpty(tags) && !string.IsNullOrEmpty(sizes))
-            {
+        //     if(!string.IsNullOrEmpty(tags) && !string.IsNullOrEmpty(sizes))
+        //     {
 
-                var response = await _supabaseClient.From<Product>()
-                    .Where(x => x.tags.Contains(tags) &&
-                                 x.sizes.Contains(sizes))
-                    .Get();
+        //         var response = await _supabaseClient.From<Product>()
+        //             .Where(x => x.tags.Contains(tags) &&
+        //                          x.sizes.Contains(sizes))
+        //             .Get();
  
 
-                return response.Models;
-            }
-            else if (!string.IsNullOrEmpty(tags))
-            {
-                var response = await _supabaseClient.From<Product>()
-                    .Where(x => x.tags.Contains(tags))
-                    .Get();
+        //         return response.Models;
+        //     }
+        //     else if (!string.IsNullOrEmpty(tags))
+        //     {
+        //         var response = await _supabaseClient.From<Product>()
+        //             .Where(x => x.tags.Contains(tags))
+        //             .Get();
 
-                return response.Models;
-            }
-            else if (!string.IsNullOrEmpty(sizes))
-            {
-                var response = await _supabaseClient.From<Product>()
-                    .Where(x => x.sizes.Contains(sizes))
-                    .Get();
+        //         return response.Models;
+        //     }
+        //     else if (!string.IsNullOrEmpty(sizes))
+        //     {
+        //         var response = await _supabaseClient.From<Product>()
+        //             .Where(x => x.sizes.Contains(sizes))
+        //             .Get();
 
-                return response.Models;
-            }
+        //         return response.Models;
+        //     }
 
-            return null;
+        //     return null;
+        // }
+
+        public async Task<List<Product>> GetProductsByFilter(string? tags, string? sizes, string? sort)
+{
+    List<Product> products;
+
+    // Get products based on filters
+    if (!string.IsNullOrEmpty(tags) && !string.IsNullOrEmpty(sizes))
+    {
+        var response = await _supabaseClient.From<Product>()
+            .Where(x => x.tags.Contains(tags) && x.sizes.Contains(sizes))
+            .Get();
+
+        products = response.Models;
+    }
+    else if (!string.IsNullOrEmpty(tags))
+    {
+        var response = await _supabaseClient.From<Product>()
+            .Where(x => x.tags.Contains(tags))
+            .Get();
+
+        products = response.Models;
+    }
+    else if (!string.IsNullOrEmpty(sizes))
+    {
+        var response = await _supabaseClient.From<Product>()
+            .Where(x => x.sizes.Contains(sizes))
+            .Get();
+
+        products = response.Models;
+    }
+    else
+    {
+        // If no filters, get all products
+        var allProductsResponse = await _supabaseClient.From<Product>().Get();
+        products = allProductsResponse.Models;
+    }
+
+    // Sorting logic
+    if (products != null)
+    {
+        switch (sort)
+        {
+            case "price-high-to-low":
+                products = products.OrderByDescending(p => p.price).ToList();
+                break;
+
+            case "price-low-to-high":
+                products = products.OrderBy(p => p.price).ToList();
+                break;
+
+            case "alphabetical":
+                products = products.OrderBy(p => p.name).ToList();
+                break;
+
+            case "most-popular":
+            return products;
         }
+    }
+
+    return products;
+}
+
 
 
 
