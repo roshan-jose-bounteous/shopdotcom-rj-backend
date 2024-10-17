@@ -33,14 +33,51 @@ namespace shopdotcobackend.Services
         }
 
         // Get Product by Tags
-         public async Task<List<Product>> GetProductsByTags(string tags)
-        {
-            var response = await _supabaseClient.From<Product>()
-        .Where(x => x.tags.Contains(tags))
-        .Get();
+        //  public async Task<List<Product>> GetProductsByTags(string tags)
+        // {
+        //     var response = await _supabaseClient.From<Product>()
+        // .Where(x => x.tags.Contains(tags))
+        // .Get();
 
-            return response.Models;
+        //     return response.Models;
+        // }
+
+         public async Task<List<Product>> GetProductsByFilter(string? tags, string? sizes)
+         
+        {
+
+            if(!string.IsNullOrEmpty(tags) && !string.IsNullOrEmpty(sizes))
+            {
+
+                var response = await _supabaseClient.From<Product>()
+                    .Where(x => x.tags.Contains(tags) &&
+                                 x.sizes.Contains(sizes))
+                    .Get();
+ 
+
+                return response.Models;
+            }
+            else if (!string.IsNullOrEmpty(tags))
+            {
+                var response = await _supabaseClient.From<Product>()
+                    .Where(x => x.tags.Contains(tags))
+                    .Get();
+
+                return response.Models;
+            }
+            else if (!string.IsNullOrEmpty(sizes))
+            {
+                var response = await _supabaseClient.From<Product>()
+                    .Where(x => x.sizes.Contains(sizes))
+                    .Get();
+
+                return response.Models;
+            }
+
+            return null;
         }
+
+
 
         // // Add a new product
         public async Task<Product?> AddProduct(Product product)

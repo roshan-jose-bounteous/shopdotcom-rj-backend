@@ -26,11 +26,31 @@ namespace shopdotcobackend.controllers
         {
             var products = await _supabaseService.GetAllProducts();
 
-            // return Ok(products);
             var serializedProducts = JsonConvert.SerializeObject(products);
             return Ok(serializedProducts);
 
         }
+
+        // GET: api/product/tags
+
+        [HttpGet("filter")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByFilter(string? tags, string? sizes)
+        {
+
+            if (string.IsNullOrEmpty(tags) && string.IsNullOrEmpty(sizes))
+            {
+                return BadRequest("At least one filter (tags or sizes) is required.");
+            }
+
+            var products = await _supabaseService.GetProductsByFilter(tags, sizes);
+            if (products == null || !products.Any())
+            {
+                return NotFound("No products found for the specified filters.");
+            }
+
+            return Ok(products);
+        }
+
 
         // GET: api/product/{id}
         [HttpGet("{id}")]
@@ -48,22 +68,22 @@ namespace shopdotcobackend.controllers
 
 
 // GET: api/product/tags
-        [HttpGet("tags")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByTags(string tags)
-        {
-            if (tags == null || !tags.Any())
-            {
-                return BadRequest("Tags are required.");
-            }
+        // [HttpGet("tags")]
+        // public async Task<ActionResult<IEnumerable<Product>>> GetProductsByTags(string tags)
+        // {
+        //     if (tags == null || !tags.Any())
+        //     {
+        //         return BadRequest("Tags are required.");
+        //     }
 
-            var products = await _supabaseService.GetProductsByTags(tags);
-            if (products == null || !products.Any())
-            {
-                return NotFound("No products found for the specified tags.");
-            }
+        //     var products = await _supabaseService.GetProductsByTags(tags);
+        //     if (products == null || !products.Any())
+        //     {
+        //         return NotFound("No products found for the specified tags.");
+        //     }
 
-            return Ok(products);
-        }
+        //     return Ok(products);
+        // }
         // POST: api/product
         [HttpPost]
         public async Task<ActionResult> AddProduct([FromBody] Product product)
