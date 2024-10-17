@@ -20,7 +20,9 @@ namespace shopdotcobackend.Models
         [Column("quantity")]
         public int quantity { get; set; }
 
-        // Navigation property for the related product details
-        public Product Product { get; set; } = new Product();
+        [Column("size")]
+        public string size { get; set; }
+
+
     }
 }

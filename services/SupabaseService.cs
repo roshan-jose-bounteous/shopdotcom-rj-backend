@@ -62,6 +62,24 @@ public async Task<List<Product>> GetProductsBySort(string sort)
     }
 }
 
+
+public async Task<List<Product>> GetRelatedProductsByTags(List<string> tags, int excludedProductId)
+{
+    var response = await _supabaseClient.From<Product>().Get();
+    var products = response.Models;
+
+    if (products == null || !products.Any())
+    {
+        return new List<Product>(); // Return an empty list if no products found
+    }
+
+    // Filter products by checking if their tags match the given tags and exclude the specified ID
+    return products
+        .Where(p => p.id != excludedProductId && p.tags != null && p.tags.Any(tag => tags.Contains(tag, StringComparer.OrdinalIgnoreCase)))
+        .ToList();
+}
+
+
         // Get Product by Tags
         //  public async Task<List<Product>> GetProductsByTags(string tags)
         // {
@@ -194,40 +212,67 @@ public async Task<List<Product>> GetProductsBySort(string sort)
 
 
 
-        public async Task<List<Cart>> GetCartItemsByUserId(string user_id)
+        // public async Task<List<Cart>> GetCartItemsByUserId(string user_id)
+        // {
+        //     var response = await _supabaseClient.From<Cart>()
+        //         .Where(x => x.user_id == user_id)
+        //         .Get();
+
+
+
+        //     return response.Models;
+        // }
+
+
+public async Task<List<CartItemWithProduct>> GetCartItemsByUserId(string user_id)
+{
+    var cartResponse = await _supabaseClient.From<Cart>()
+        .Where(x => x.user_id == user_id)
+        .Get();
+
+    var cartItems = cartResponse.Models;
+    var cartItemsWithProducts = new List<CartItemWithProduct>();
+
+    foreach (var cartItem in cartItems)
+    {
+        var product = await _supabaseClient.From<Product>()
+            .Where(x => x.id == cartItem.product_id)
+            .Single();
+
+        if (product != null)
         {
-            var response = await _supabaseClient.From<Cart>()
-                .Where(x => x.user_id == user_id)
-                .Get();
-
-            // Populate Product details for each Cart item
-            foreach (var cartItem in response.Models)
+            cartItemsWithProducts.Add(new CartItemWithProduct
             {
-                var productResponse = await _supabaseClient.From<Product>()
-                    .Where(p => p.id == cartItem.product_id)
-                    .Single();
-
-                if (productResponse != null)
-                {
-                    cartItem.Product = productResponse;
-                }
-            }
-
-            return response.Models;
+                CartItem = cartItem,
+                Product = product
+            });
         }
+    }
+
+    return cartItemsWithProducts;
+}
 
         // Add an item to the cart
+        // public async Task<Cart?> AddToCart(Cart cart)
+        // {
+        //     var response = await _supabaseClient.From<Cart>().Insert(cart);
+        //     return response.Model;
+        // }
+
         public async Task<Cart?> AddToCart(Cart cart)
-        {
-            var response = await _supabaseClient.From<Cart>().Insert(cart);
-            return response.Model;
-        }
+{
+
+
+    // If the product exists, proceed with the cart insertion
+    var response = await _supabaseClient.From<Cart>().Insert(cart);
+    return response.Model;
+}
+
 
         // Update the quantity of a cart item
         public async Task<Cart?> UpdateCartItem(int id, int quantity)
         {
-            var cartItem = new Cart { id = id, quantity = quantity };
-            var response = await _supabaseClient.From<Cart>().Where(x => x.id == id).Update(cartItem);
+            var response = await _supabaseClient.From<Cart>().Where(x => x.id == id).Set(x=> x.quantity,  quantity).Update();
             return response.Model;
         }
 

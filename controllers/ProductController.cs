@@ -64,7 +64,7 @@ namespace shopdotcobackend.controllers
         return Ok(products);
     }
 
-    
+
 
         [HttpGet("filter")]
 public async Task<ActionResult<IEnumerable<Product>>> GetProductsByFilter(string? tags, string? sizes, string? sort)
@@ -79,6 +79,25 @@ public async Task<ActionResult<IEnumerable<Product>>> GetProductsByFilter(string
     if (products == null || !products.Any())
     {
         return NotFound("No products found for the specified filters.");
+    }
+
+    return Ok(products);
+}
+
+
+[HttpPost("related-by-tags")]
+public async Task<ActionResult<IEnumerable<Product>>> GetRelatedProductsByTags([FromBody] List<string> tags, [FromQuery] int excludedProductId)
+{
+    if (tags == null || !tags.Any())
+    {
+        return BadRequest("Tags list cannot be null or empty.");
+    }
+
+    var products = await _supabaseService.GetRelatedProductsByTags(tags, excludedProductId);
+
+    if (products == null || !products.Any())
+    {
+        return NotFound("No related products found.");
     }
 
     return Ok(products);

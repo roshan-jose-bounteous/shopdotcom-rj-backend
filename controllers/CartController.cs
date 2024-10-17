@@ -23,23 +23,34 @@ namespace shopdotcobackend.controllers
 
         // GET: api/cart/user/{userId}
         [HttpGet("user/{userId}")]
-        public async Task<ActionResult<IEnumerable<Cart>>> GetCartItemsByUserId(string userId)
-        {
-            var cartItems = await _supabaseService.GetCartItemsByUserId(userId);
-            return Ok(cartItems);
-        }
+        // public async Task<ActionResult<IEnumerable<Cart>>> GetCartItemsByUserId(string userId)
+        // {
+        //     var cartItems = await _supabaseService.GetCartItemsByUserId(userId);
+        //     return Ok(cartItems);
+        // }
 
-        // POST: api/cart
-        [HttpPost]
-        public async Task<ActionResult> AddToCart([FromBody] Cart cart)
-        {
-            var addedCartItem = await _supabaseService.AddToCart(cart);
-            return CreatedAtAction(nameof(GetCartItemsByUserId), new { user_id = addedCartItem?.user_id }, addedCartItem);
-        }
+        public async Task<ActionResult<IEnumerable<CartItemWithProduct>>> GetCartItemsByUserId(string userId)
+{
+    var cartItemsWithProducts = await _supabaseService.GetCartItemsByUserId(userId);
+    return Ok(cartItemsWithProducts);
+}
+
+
+        // POST: api/cart/add
+  [HttpPost("add")]
+public async Task<ActionResult> AddToCart([FromBody] Cart cart)
+{
+    // Add the cart item using your service
+Console.WriteLine($"Hello {(cart)}");
+    
+    var addedCartItem = await _supabaseService.AddToCart(cart);
+    return CreatedAtAction(nameof(GetCartItemsByUserId), new { user_id = addedCartItem?.user_id }, addedCartItem);
+}
+
 
         // PUT: api/cart/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateCartItem(int id, [FromBody] int quantity)
+        public async Task<ActionResult> UpdateCartItem(int id, int quantity)
         {
             var updatedCartItem = await _supabaseService.UpdateCartItem(id, quantity);
             if (updatedCartItem == null)
