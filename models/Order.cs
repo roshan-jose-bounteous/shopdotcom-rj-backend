@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace shopdotcobackend.Models
 {
-    [Table("orders")] // Match the table name in the Supabase database
+    [Table("orders")] 
     public class Order : BaseModel
     {
         [PrimaryKey("id", false)]

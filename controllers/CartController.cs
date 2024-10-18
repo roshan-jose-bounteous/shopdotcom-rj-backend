@@ -21,13 +21,7 @@ namespace shopdotcobackend.controllers
             _supabaseService = supabaseService;
         }
 
-        // GET: api/cart/user/{userId}
-        [HttpGet("user/{userId}")]
-        // public async Task<ActionResult<IEnumerable<Cart>>> GetCartItemsByUserId(string userId)
-        // {
-        //     var cartItems = await _supabaseService.GetCartItemsByUserId(userId);
-        //     return Ok(cartItems);
-        // }
+
 
         public async Task<ActionResult<IEnumerable<CartItemWithProduct>>> GetCartItemsByUserId(string userId)
 {
@@ -40,7 +34,6 @@ namespace shopdotcobackend.controllers
   [HttpPost("add")]
 public async Task<IActionResult> AddToCart([FromBody] Cart cart)
 {
-    // Add the cart item using your service
 Console.WriteLine($"Hello {(cart)}");
     
     var addedCartItem = await _supabaseService.AddToCart(cart);

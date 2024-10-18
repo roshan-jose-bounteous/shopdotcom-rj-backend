@@ -1,11 +1,11 @@
-// Models/Cart.cs
+
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace shopdotcobackend.Models
 {
-    [Table("cart")] // Match the table name in the Supabase database
+    [Table("cart")] 
     public class Cart : BaseModel
     {
         [PrimaryKey("id", false)]

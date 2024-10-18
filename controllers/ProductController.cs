@@ -31,25 +31,7 @@ namespace shopdotcobackend.controllers
 
         }
 
-        // GET: api/product/tags
-
-        // [HttpGet("filter")]
-        // public async Task<ActionResult<IEnumerable<Product>>> GetProductsByFilter(string? tags, string? sizes)
-        // {
-
-        //     if (string.IsNullOrEmpty(tags) && string.IsNullOrEmpty(sizes))
-        //     {
-        //         return await GetAllProducts();
-        //     }
-
-        //     var products = await _supabaseService.GetProductsByFilter(tags, sizes);
-        //     if (products == null || !products.Any())
-        //     {
-        //         return NotFound("No products found for the specified filters.");
-        //     }
-
-        //     return Ok(products);
-        // }
+        
 
          [HttpGet("sort")]
     public async Task<ActionResult<IEnumerable<Product>>> GetProductsBySort(string sort)
@@ -72,7 +54,7 @@ public async Task<ActionResult<IEnumerable<Product>>> GetProductsByFilter(string
     // Get all products if no filters or sort specified
     if (string.IsNullOrEmpty(tags) && string.IsNullOrEmpty(sizes))
     {
-        return await GetProductsBySort(sort); // Call the new GetProductsBySort method
+        return await GetProductsBySort(sort); 
     }
 
     var products = await _supabaseService.GetProductsByFilter(tags, sizes, sort);
@@ -120,23 +102,6 @@ public async Task<ActionResult<IEnumerable<Product>>> GetRelatedProductsByTags([
         }
 
 
-// GET: api/product/tags
-        // [HttpGet("tags")]
-        // public async Task<ActionResult<IEnumerable<Product>>> GetProductsByTags(string tags)
-        // {
-        //     if (tags == null || !tags.Any())
-        //     {
-        //         return BadRequest("Tags are required.");
-        //     }
-
-        //     var products = await _supabaseService.GetProductsByTags(tags);
-        //     if (products == null || !products.Any())
-        //     {
-        //         return NotFound("No products found for the specified tags.");
-        //     }
-
-        //     return Ok(products);
-        // }
         // POST: api/product
         [HttpPost]
         public async Task<ActionResult> AddProduct([FromBody] Product product)
@@ -153,7 +118,7 @@ public async Task<ActionResult<IEnumerable<Product>>> GetRelatedProductsByTags([
             {
                 return NotFound($"Product with ID {id} not found.");
             }
-            return Ok("Deleted Succesfully"); // 204 No Content response
+            return Ok("Deleted Succesfully"); 
         }
     }
 }
