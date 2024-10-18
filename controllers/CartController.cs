@@ -38,13 +38,16 @@ namespace shopdotcobackend.controllers
 
         // POST: api/cart/add
   [HttpPost("add")]
-public async Task<ActionResult> AddToCart([FromBody] Cart cart)
+public async Task<IActionResult> AddToCart([FromBody] Cart cart)
 {
     // Add the cart item using your service
 Console.WriteLine($"Hello {(cart)}");
     
     var addedCartItem = await _supabaseService.AddToCart(cart);
-    return CreatedAtAction(nameof(GetCartItemsByUserId), new { user_id = addedCartItem?.user_id }, addedCartItem);
+            Console.WriteLine($"Added: {Newtonsoft.Json.JsonConvert.SerializeObject(addedCartItem)}");
+
+
+    return Ok(addedCartItem);
 }
 
 

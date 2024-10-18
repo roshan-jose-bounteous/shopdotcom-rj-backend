@@ -23,6 +23,8 @@ namespace shopdotcobackend.Models
         [Column("size")]
         public string size { get; set; }
 
+        [Column("is_placed")]
+        public bool is_placed { get; set; } = false;
 
     }
 }

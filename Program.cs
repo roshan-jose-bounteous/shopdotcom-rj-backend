@@ -1,6 +1,7 @@
 using System.Text;
 using shopdotcobackend.Services;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Supabase;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,23 @@ var url = builder.Configuration["Supabase:Url"];
 var key = builder.Configuration["Supabase:ApiKey"];
 
 
+var bytes = Encoding.UTF8.GetBytes(builder.Configuration["Authentication:JwtSecret"] ?? throw new ArgumentNullException("Authentication:JwtSecret", "Authentication JwtSecret is missing from configuration."));
+
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(bytes),
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Authentication:ValidAudience"],
+            ValidIssuer = builder.Configuration["Authentication:ValidIssuer"],
+            ValidateLifetime = true,
+        };
+    });
  
 builder.Services.AddSingleton(sp =>
 {
@@ -67,6 +85,7 @@ if (app.Environment.IsDevelopment())
 
  
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
  

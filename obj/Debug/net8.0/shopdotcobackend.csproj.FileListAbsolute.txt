@@ -52,3 +52,6 @@ C:\Users\RoshanJoseAJ\Documents\C#_backend\shopdotcobackend\bin\Debug\net8.0\Sup
 C:\Users\RoshanJoseAJ\Documents\C#_backend\shopdotcobackend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
 C:\Users\RoshanJoseAJ\Documents\C#_backend\shopdotcobackend\bin\Debug\net8.0\System.Reactive.dll
 C:\Users\RoshanJoseAJ\Documents\C#_backend\shopdotcobackend\bin\Debug\net8.0\Websocket.Client.dll
+C:\Users\RoshanJoseAJ\Documents\C#_backend\shopdotcobackend\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\RoshanJoseAJ\Documents\C#_backend\shopdotcobackend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\RoshanJoseAJ\Documents\C#_backend\shopdotcobackend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
