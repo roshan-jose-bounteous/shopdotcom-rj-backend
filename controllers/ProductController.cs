@@ -33,56 +33,97 @@ namespace shopdotcobackend.controllers
 
         
 
-         [HttpGet("sort")]
-    public async Task<ActionResult<IEnumerable<Product>>> GetProductsBySort(string sort)
-    {
-        var products = await _supabaseService.GetProductsBySort(sort);
+//          [HttpGet("sort")]
+//     public async Task<ActionResult<IEnumerable<Product>>> GetProductsBySort(string sort)
+//     {
+//         var products = await _supabaseService.GetProductsBySort(sort);
 
-        if (products == null || !products.Any())
+//         if (products == null || !products.Any())
+//         {
+//             return NotFound("No products found.");
+//         }
+
+//         return Ok(products);
+//     }
+
+
+
+//         [HttpGet("filter")]
+// public async Task<ActionResult<IEnumerable<Product>>> GetProductsByFilter(string? tags, string? sizes, string? sort)
+// {
+//     // Get all products if no filters or sort specified
+//     if (string.IsNullOrEmpty(tags) && string.IsNullOrEmpty(sizes))
+//     {
+//         return await GetProductsBySort(sort); 
+//     }
+
+//     var products = await _supabaseService.GetProductsByFilter(tags, sizes, sort);
+//     if (products == null || !products.Any())
+//     {
+//         return NotFound("No products found for the specified filters.");
+//     }
+
+//     return Ok(products);
+// }
+
+
+// [HttpPost("related-by-tags")]
+// public async Task<ActionResult<IEnumerable<Product>>> GetRelatedProductsByTags([FromBody] List<string> tags, [FromQuery] int excludedProductId)
+// {
+//     if (tags == null || !tags.Any())
+//     {
+//         return BadRequest("Tags list cannot be null or empty.");
+//     }
+
+//     var products = await _supabaseService.GetRelatedProductsByTags(tags, excludedProductId);
+
+//     if (products == null || !products.Any())
+//     {
+//         return NotFound("No related products found.");
+//     }
+
+//     return Ok(products);
+// }
+
+
+[HttpGet("products")]
+public async Task<ActionResult<IEnumerable<Product>>> GetProducts(
+    string? sort = null, 
+    string? tags = null, 
+    string? sizes = null, 
+    [FromQuery] List<string>? relatedTags = null, 
+    int? excludedProductId = null)
+{
+    // Case 1: Fetch related products based on tags
+    if (relatedTags != null && relatedTags.Any() && excludedProductId.HasValue)
+    {
+        var relatedProducts = await _supabaseService.GetRelatedProductsByTags(relatedTags, excludedProductId.Value);
+        if (relatedProducts == null || !relatedProducts.Any())
         {
-            return NotFound("No products found.");
+            return NotFound("No related products found.");
         }
-
-        return Ok(products);
+        return Ok(relatedProducts);
     }
 
-
-
-        [HttpGet("filter")]
-public async Task<ActionResult<IEnumerable<Product>>> GetProductsByFilter(string? tags, string? sizes, string? sort)
-{
-    // Get all products if no filters or sort specified
-    if (string.IsNullOrEmpty(tags) && string.IsNullOrEmpty(sizes))
+    // Case 2: Get products filtered by tags, sizes, and optionally sorted
+    if (!string.IsNullOrEmpty(tags) || !string.IsNullOrEmpty(sizes))
     {
-        return await GetProductsBySort(sort); 
+        var filteredProducts = await _supabaseService.GetProductsByFilter(tags, sizes, sort);
+        if (filteredProducts == null || !filteredProducts.Any())
+        {
+            return NotFound("No products found for the specified filters.");
+        }
+        return Ok(filteredProducts);
     }
 
-    var products = await _supabaseService.GetProductsByFilter(tags, sizes, sort);
-    if (products == null || !products.Any())
+    // Case 3: Get products by sorting if no filters are provided
+    var sortedProducts = await _supabaseService.GetProductsBySort(sort);
+    if (sortedProducts == null || !sortedProducts.Any())
     {
-        return NotFound("No products found for the specified filters.");
+        return NotFound("No products found.");
     }
 
-    return Ok(products);
-}
-
-
-[HttpPost("related-by-tags")]
-public async Task<ActionResult<IEnumerable<Product>>> GetRelatedProductsByTags([FromBody] List<string> tags, [FromQuery] int excludedProductId)
-{
-    if (tags == null || !tags.Any())
-    {
-        return BadRequest("Tags list cannot be null or empty.");
-    }
-
-    var products = await _supabaseService.GetRelatedProductsByTags(tags, excludedProductId);
-
-    if (products == null || !products.Any())
-    {
-        return NotFound("No related products found.");
-    }
-
-    return Ok(products);
+    return Ok(sortedProducts);
 }
 
 

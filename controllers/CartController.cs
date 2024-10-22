@@ -22,7 +22,7 @@ namespace shopdotcobackend.controllers
         }
 
 
-
+    [HttpGet("user/{userId}")]
         public async Task<ActionResult<IEnumerable<CartItemWithProduct>>> GetCartItemsByUserId(string userId)
 {
     var cartItemsWithProducts = await _supabaseService.GetCartItemsByUserId(userId);
