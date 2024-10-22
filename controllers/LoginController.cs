@@ -8,7 +8,7 @@ using Supabase.Gotrue.Exceptions;
 namespace shopdotcobackend.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/")]
     public class LoginController : ControllerBase
     {
         private readonly Supabase.Client _supabaseClient;
@@ -20,7 +20,7 @@ namespace shopdotcobackend.Controllers
             _supabaseClient = SupabaseClient;
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             if (request == null || string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
